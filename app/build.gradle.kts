@@ -52,4 +52,8 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     // Componente RecyclerView para mostrar listas de tarjetas
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+    // Corrutinas de Kotlin para ejecutar tareas en segundo plano en Android
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    // Proporciona lifecycleScope para lanzar corrutinas ligadas al ciclo de vida de la pantalla
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 }
