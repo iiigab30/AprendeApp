@@ -3,6 +3,8 @@ package com.example.aprendeapp.view
 
 // Importa LayoutInflater para crear las tarjetas
 import android.view.LayoutInflater
+// Importa View para controlar visibilidades
+import android.view.View
 // Importa ViewGroup, el contenedor padre de cada tarjeta
 import android.view.ViewGroup
 // Importa DiffUtil para actualizar la lista solo con los cambios
@@ -21,20 +23,28 @@ import com.example.aprendeapp.databinding.ItemRecursoBinding
 import com.example.aprendeapp.model.Recurso
 // Importa la utilidad de tipos
 import com.example.aprendeapp.utils.TiposRecurso
-import android.view.View
 
 // Adaptador que dibuja cada recurso como una tarjeta
 class RecursoAdapter(
-    // Indica si el usuario actual es docente (para mostrar los botones de edición)
+    // Indica si el usuario actual es docente (muestra editar/eliminar; si no, favorito/calificar)
     private val esDocente: Boolean,
-    // Función que se ejecuta cuando el usuario toca el enlace de una tarjeta
+    // Se ejecuta cuando el usuario toca el enlace de una tarjeta
     private val alAbrirEnlace: (Recurso) -> Unit,
-    // Función que se ejecuta cuando el docente pulsa "Editar"
+    // Se ejecuta cuando el docente pulsa "Editar"
     private val alEditar: (Recurso) -> Unit,
-    // Función que se ejecuta cuando el docente pulsa "Eliminar"
-    private val alEliminar: (Recurso) -> Unit
+    // Se ejecuta cuando el docente pulsa "Eliminar"
+    private val alEliminar: (Recurso) -> Unit,
+    // Pregunta si un recurso es favorito del usuario actual
+    private val esFavorito: (Recurso) -> Boolean,
+    // Marca o desmarca un favorito y devuelve el nuevo estado
+    private val alAlternarFavorito: (Recurso) -> Boolean,
+    // Devuelve el voto del usuario actual a un recurso (0 si no ha votado)
+    private val miCalificacion: (Recurso) -> Int,
+    // Se ejecuta cuando el estudiante pulsa "Calificar"
+    private val alCalificar: (Recurso) -> Unit
 // Hereda de ListAdapter indicando el modelo y el ViewHolder
 ) : ListAdapter<Recurso, RecursoAdapter.RecursoViewHolder>(Comparador) {
+
     // Guarda las vistas de una tarjeta para reutilizarlas al hacer scroll
     class RecursoViewHolder(val binding: ItemRecursoBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -46,6 +56,11 @@ class RecursoAdapter(
         override fun areContentsTheSame(anterior: Recurso, nuevo: Recurso) = anterior == nuevo
         // Cierra el comparador
     }
+
+    // Devuelve el ícono de estrella llena o vacía según el estado de favorito
+    private fun iconoFavorito(activo: Boolean): Int =
+        // Estrella amarilla si es favorito, estrella gris si no
+        if (activo) android.R.drawable.btn_star_big_on else android.R.drawable.btn_star_big_off
 
     // Crea una tarjeta vacía
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecursoViewHolder {
@@ -78,12 +93,6 @@ class RecursoAdapter(
             tvEnlace.text = recurso.enlace
             // Al tocar el enlace, avisa a la pantalla para que lo abra
             tvEnlace.setOnClickListener { alAbrirEnlace(recurso) }
-            // Muestra la fila de acciones solo si el usuario es docente
-            llAcciones.visibility = if (esDocente) View.VISIBLE else View.GONE
-            // Al pulsar "Editar" avisa a la pantalla con el recurso de esta tarjeta
-            btnEditar.setOnClickListener { alEditar(recurso) }
-            // Al pulsar "Eliminar" avisa a la pantalla con el recurso de esta tarjeta
-            btnEliminar.setOnClickListener { alEliminar(recurso) }
             // Carga la imagen desde la URL
             Glide.with(holder.itemView)
                 // Indica la URL de la imagen
@@ -94,6 +103,32 @@ class RecursoAdapter(
                 .error(android.R.drawable.ic_menu_report_image)
                 // Coloca el resultado en el ImageView
                 .into(ivImagen)
+
+            // Muestra la fila del docente solo si el usuario es docente
+            llAcciones.visibility = if (esDocente) View.VISIBLE else View.GONE
+            // Al pulsar "Editar" avisa a la pantalla con el recurso de esta tarjeta
+            btnEditar.setOnClickListener { alEditar(recurso) }
+            // Al pulsar "Eliminar" avisa a la pantalla con el recurso de esta tarjeta
+            btnEliminar.setOnClickListener { alEliminar(recurso) }
+
+            // Muestra la fila del estudiante solo si el usuario NO es docente
+            llEstudiante.visibility = if (esDocente) View.GONE else View.VISIBLE
+            // Dibuja la estrella llena o vacía según el estado actual del favorito
+            ibFavorito.setImageResource(iconoFavorito(esFavorito(recurso)))
+            // Al pulsar la estrella
+            ibFavorito.setOnClickListener {
+                // Marca o desmarca el favorito y obtiene el nuevo estado
+                val ahoraEsFavorito = alAlternarFavorito(recurso)
+                // Actualiza la estrella al instante
+                ibFavorito.setImageResource(iconoFavorito(ahoraEsFavorito))
+                // Cierra el listener
+            }
+            // Obtiene el voto que este usuario dio a este recurso
+            val miVoto = miCalificacion(recurso)
+            // Si ya votó muestra su voto; si no, muestra "Calificar"
+            btnCalificar.text = if (miVoto > 0) contexto.getString(R.string.btn_calificar_mia, miVoto) else contexto.getString(R.string.btn_calificar)
+            // Al pulsar el botón abre el diálogo de calificación
+            btnCalificar.setOnClickListener { alCalificar(recurso) }
             // Cierra el with
         }
         // Cierra la función

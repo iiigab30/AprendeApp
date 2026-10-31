@@ -1,13 +1,13 @@
 // Declara el paquete de la clase
 package com.example.aprendeapp
 
-// Importa ActivityNotFoundException por si no hay app para abrir el enlace
+// Importa la excepción que ocurre si no hay app para abrir un enlace
 import android.content.ActivityNotFoundException
-// Importa Intent para navegar y abrir enlaces
+// Importa Intent para navegar entre pantallas y abrir enlaces
 import android.content.Intent
 // Importa Uri para convertir el texto del enlace en una dirección
 import android.net.Uri
-// Importa Bundle para el ciclo de vida
+// Importa Bundle para el ciclo de vida de la pantalla
 import android.os.Bundle
 // Importa View para controlar visibilidades
 import android.view.View
@@ -15,7 +15,7 @@ import android.view.View
 import android.widget.AdapterView
 // Importa ArrayAdapter para llenar los spinners
 import android.widget.ArrayAdapter
-// Importa Spinner
+// Importa Spinner (lista desplegable)
 import android.widget.Spinner
 // Importa Toast para mensajes cortos
 import android.widget.Toast
@@ -23,41 +23,52 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 // Importa la función que reacciona cuando cambia el texto de un campo
 import androidx.core.widget.doAfterTextChanged
-// Importa lifecycleScope para lanzar corrutinas
+// Importa lifecycleScope para lanzar corrutinas ligadas a la pantalla
 import androidx.lifecycle.lifecycleScope
 // Importa el administrador de diseño que coloca las tarjetas en una columna
 import androidx.recyclerview.widget.LinearLayoutManager
-// Importa el controlador y sus tipos de apoyo
+// Importa los campos de búsqueda disponibles
 import com.example.aprendeapp.controller.CampoBusqueda
+// Importa los criterios de orden disponibles
 import com.example.aprendeapp.controller.Orden
+// Importa el controlador con la lógica de recursos
 import com.example.aprendeapp.controller.RecursoController
+// Importa el resultado de crear, actualizar, eliminar y calificar
+import com.example.aprendeapp.controller.ResultadoOperacion
+// Importa el resultado de cargar la lista
 import com.example.aprendeapp.controller.ResultadoRecursos
 // Importa el binding generado a partir de activity_main.xml
 import com.example.aprendeapp.databinding.ActivityMainBinding
+// Importa el binding generado a partir de dialog_calificar.xml
+import com.example.aprendeapp.databinding.DialogCalificarBinding
 // Importa el modelo de recurso
 import com.example.aprendeapp.model.Recurso
-// Importa las utilidades
+// Importa el manejador de favoritos y votos del usuario
+import com.example.aprendeapp.utils.InteraccionManager
+// Importa el manejador de la sesión
 import com.example.aprendeapp.utils.SesionManager
+// Importa los tipos de recurso (libro, video, artículo, tutorial)
 import com.example.aprendeapp.utils.TiposRecurso
-// Importa el adaptador y el login
+// Importa la pantalla del formulario del docente
+import com.example.aprendeapp.view.FormularioRecursoActivity
+// Importa la pantalla de login
 import com.example.aprendeapp.view.LoginActivity
+// Importa el adaptador que dibuja las tarjetas
 import com.example.aprendeapp.view.RecursoAdapter
-// Importa launch para iniciar corrutinas
-import kotlinx.coroutines.launch
 // Importa el constructor de diálogos de Material
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-// Importa el resultado de operaciones del controlador
-import com.example.aprendeapp.controller.ResultadoOperacion
-// Importa la pantalla del formulario
-import com.example.aprendeapp.view.FormularioRecursoActivity
+// Importa launch para iniciar corrutinas
+import kotlinx.coroutines.launch
 
-// Pantalla principal: lista de recursos con búsqueda, filtro y orden
+// Pantalla principal: lista de recursos con búsqueda, filtros, orden, CRUD, favoritos y calificación
 class MainActivity : AppCompatActivity() {
 
     // Acceso a las vistas del layout
     private lateinit var binding: ActivityMainBinding
     // Manejador de la sesión local
     private lateinit var sesion: SesionManager
+    // Manejador de favoritos y votos del usuario actual
+    private lateinit var interacciones: InteraccionManager
     // Adaptador que dibuja las tarjetas
     private lateinit var adaptador: RecursoAdapter
     // Controlador con la lógica de recursos
@@ -71,6 +82,8 @@ class MainActivity : AppCompatActivity() {
     private var orden = Orden.TITULO_ASC
     // Tipo elegido en los chips (null significa todos)
     private var tipoFiltro: String? = null
+    // Indica si el chip "Favoritos" está seleccionado
+    private var soloFavoritos = false
     // Indica si se está cargando desde la API
     private var cargando = false
 
@@ -80,6 +93,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // Crea el manejador de sesión
         sesion = SesionManager(this)
+        // Crea el manejador de favoritos y votos para el usuario que inició sesión
+        interacciones = InteraccionManager(this, sesion.obtenerId())
         // Infla el layout y crea el binding
         binding = ActivityMainBinding.inflate(layoutInflater)
         // Muestra el layout en pantalla
@@ -90,9 +105,9 @@ class MainActivity : AppCompatActivity() {
         configurarLista()
         // Configura búsqueda, spinners y chips
         configurarFiltros()
-        // Cierra onCreate
         // Muestra el botón de agregar solo si el usuario es docente
         configurarBotonAgregar()
+        // Cierra onCreate
     }
 
     // Se ejecuta cada vez que la pantalla vuelve a primer plano (así la lista siempre está actualizada)
@@ -135,20 +150,37 @@ class MainActivity : AppCompatActivity() {
     private fun configurarLista() {
         // Crea el adaptador con las acciones de cada tarjeta
         adaptador = RecursoAdapter(
-            // Le indica si debe mostrar los botones de docente
+            // Le indica si debe mostrar los botones de docente o de estudiante
             esDocente = sesion.esDocente(),
             // Al tocar un enlace se abre en el navegador
             alAbrirEnlace = { recurso -> abrirEnlace(recurso.enlace) },
             // Al pulsar "Editar" abre el formulario con el recurso
             alEditar = { recurso -> abrirFormulario(recurso) },
             // Al pulsar "Eliminar" pide confirmación
-            alEliminar = { recurso -> confirmarEliminar(recurso) }
+            alEliminar = { recurso -> confirmarEliminar(recurso) },
+            // Consulta si un recurso es favorito
+            esFavorito = { recurso -> recurso.id?.let { interacciones.esFavorito(it) } ?: false },
+            // Marca o desmarca un favorito
+            alAlternarFavorito = { recurso -> alternarFavorito(recurso) },
+            // Consulta el voto del usuario a un recurso
+            miCalificacion = { recurso -> recurso.id?.let { interacciones.obtenerCalificacion(it) } ?: 0 },
+            // Al pulsar "Calificar" abre el diálogo de estrellas
+            alCalificar = { recurso -> mostrarDialogoCalificar(recurso) }
             // Cierra los parámetros
         )
         // Coloca las tarjetas en una sola columna vertical
         binding.rvRecursos.layoutManager = LinearLayoutManager(this)
         // Conecta el adaptador con la lista
         binding.rvRecursos.adapter = adaptador
+        // Cierra la función
+    }
+
+    // Muestra el botón flotante solo a docentes y le asigna su acción
+    private fun configurarBotonAgregar() {
+        // Si el usuario es docente muestra el botón; si no, lo mantiene oculto
+        binding.fabAgregar.visibility = if (sesion.esDocente()) View.VISIBLE else View.GONE
+        // Al pulsarlo abre el formulario vacío para crear un recurso
+        binding.fabAgregar.setOnClickListener { abrirFormulario(null) }
         // Cierra la función
     }
 
@@ -172,10 +204,16 @@ class MainActivity : AppCompatActivity() {
         }
         // Cada vez que cambia el texto del buscador, vuelve a filtrar
         binding.etBuscar.doAfterTextChanged { aplicarFiltros() }
+        // Muestra el chip de favoritos solo a estudiantes
+        binding.chipFavoritos.visibility = if (sesion.esDocente()) View.GONE else View.VISIBLE
         // Cada vez que cambia el chip seleccionado
         binding.chipGroupTipo.setOnCheckedStateChangeListener { _, idsSeleccionados ->
+            // Toma el chip seleccionado (o null si no hay)
+            val seleccionado = idsSeleccionados.firstOrNull()
+            // Activa el filtro de favoritos solo si se eligió ese chip
+            soloFavoritos = seleccionado == R.id.chipFavoritos
             // Traduce el chip seleccionado al valor de tipo que usa la API
-            tipoFiltro = when (idsSeleccionados.firstOrNull()) {
+            tipoFiltro = when (seleccionado) {
                 // Chip de libros
                 R.id.chipLibro -> TiposRecurso.LIBRO
                 // Chip de videos
@@ -184,7 +222,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.chipArticulo -> TiposRecurso.ARTICULO
                 // Chip de tutoriales
                 R.id.chipTutorial -> TiposRecurso.TUTORIAL
-                // Chip "Todos": sin filtro de tipo
+                // Chips "Todos" y "Favoritos": sin filtro de tipo
                 else -> null
                 // Cierra el when
             }
@@ -263,6 +301,8 @@ class MainActivity : AppCompatActivity() {
             campoBusqueda,
             // Tipo elegido en los chips
             tipoFiltro,
+            // Si el chip Favoritos está activo, pasa los ids favoritos; si no, null
+            if (soloFavoritos) interacciones.obtenerFavoritos() else null,
             // Orden elegido
             orden
             // Cierra los parámetros
@@ -282,15 +322,6 @@ class MainActivity : AppCompatActivity() {
         binding.pbCargando.visibility = if (estado) View.VISIBLE else View.GONE
         // Mientras carga, oculta el mensaje de lista vacía
         if (estado) binding.tvVacio.visibility = View.GONE
-        // Cierra la función
-    }
-
-    // Muestra el botón flotante solo a docentes y le asigna su acción
-    private fun configurarBotonAgregar() {
-        // Si el usuario es docente muestra el botón; si no, lo mantiene oculto
-        binding.fabAgregar.visibility = if (sesion.esDocente()) View.VISIBLE else View.GONE
-        // Al pulsarlo abre el formulario vacío para crear un recurso
-        binding.fabAgregar.setOnClickListener { abrirFormulario(null) }
         // Cierra la función
     }
 
@@ -337,6 +368,95 @@ class MainActivity : AppCompatActivity() {
                     // Informa al usuario
                     Toast.makeText(this@MainActivity, getString(R.string.msg_recurso_eliminado), Toast.LENGTH_SHORT).show()
                     // Recarga la lista para que desaparezca la tarjeta
+                    cargarRecursos()
+                    // Cierra el caso de éxito
+                }
+                // Si hubo un error
+                is ResultadoOperacion.Error -> {
+                    // Oculta el loader
+                    mostrarCarga(false)
+                    // Muestra el motivo del error
+                    Toast.makeText(this@MainActivity, getString(resultado.mensajeId), Toast.LENGTH_LONG).show()
+                    // Cierra el caso de error
+                }
+                // Cierra el when
+            }
+            // Cierra la corrutina
+        }
+        // Cierra la función
+    }
+
+    // Marca o desmarca un favorito y devuelve el nuevo estado
+    private fun alternarFavorito(recurso: Recurso): Boolean {
+        // Si el recurso no tiene id, no hace nada
+        val id = recurso.id ?: return false
+        // Cambia el estado en el almacenamiento local
+        val ahoraEsFavorito = interacciones.alternarFavorito(id)
+        // Elige el mensaje según el nuevo estado
+        val mensaje = if (ahoraEsFavorito) R.string.msg_favorito_agregado else R.string.msg_favorito_quitado
+        // Muestra el toast de confirmación
+        Toast.makeText(this, getString(mensaje), Toast.LENGTH_SHORT).show()
+        // Si se está viendo solo favoritos, actualiza la lista para que desaparezca la tarjeta
+        if (soloFavoritos) aplicarFiltros()
+        // Devuelve el nuevo estado
+        return ahoraEsFavorito
+        // Cierra la función
+    }
+
+    // Muestra el diálogo con las estrellas para calificar un recurso
+    private fun mostrarDialogoCalificar(recurso: Recurso) {
+        // Si el recurso no tiene id, no hace nada
+        val id = recurso.id ?: return
+        // Crea el contenido del diálogo a partir de su layout
+        val dialogoBinding = DialogCalificarBinding.inflate(layoutInflater)
+        // Obtiene el voto anterior de este usuario (0 si no ha votado)
+        val anterior = interacciones.obtenerCalificacion(id)
+        // Muestra el voto anterior en las estrellas
+        dialogoBinding.rbCalificacion.rating = anterior.toFloat()
+        // Construye y muestra el diálogo
+        MaterialAlertDialogBuilder(this)
+            // Título con el nombre del recurso
+            .setTitle(getString(R.string.dialogo_calificar_titulo, recurso.titulo))
+            // Contenido: la barra de estrellas
+            .setView(dialogoBinding.root)
+            // Botón de cancelar: cierra el diálogo sin hacer nada
+            .setNegativeButton(R.string.btn_cancelar, null)
+            // Botón de enviar la calificación
+            .setPositiveButton(R.string.dialogo_calificar_enviar) { _, _ ->
+                // Lee las estrellas elegidas
+                val estrellas = dialogoBinding.rbCalificacion.rating.toInt()
+                // Si no eligió ninguna, avisa
+                if (estrellas < 1) {
+                    // Muestra el error
+                    Toast.makeText(this, getString(R.string.error_sin_estrellas), Toast.LENGTH_SHORT).show()
+                    // Si eligió al menos una
+                } else {
+                    // Envía la calificación a la API
+                    enviarCalificacion(id, estrellas, anterior)
+                    // Cierra el if
+                }
+                // Cierra el listener del botón
+            }
+            // Muestra el diálogo
+            .show()
+        // Cierra la función
+    }
+
+    // Envía la calificación a la API y recarga la lista con el nuevo promedio
+    private fun enviarCalificacion(id: String, estrellas: Int, anterior: Int) {
+        // Muestra el loader
+        mostrarCarga(true)
+        // Lanza una corrutina para consultar la API
+        lifecycleScope.launch {
+            // Evalúa el resultado de la calificación
+            when (val resultado = controlador.calificar(id, estrellas, anterior)) {
+                // Si se guardó correctamente
+                is ResultadoOperacion.Exito -> {
+                    // Guarda el voto localmente para poder corregirlo después
+                    interacciones.guardarCalificacion(id, estrellas)
+                    // Agradece al usuario
+                    Toast.makeText(this@MainActivity, getString(R.string.msg_calificacion_enviada), Toast.LENGTH_SHORT).show()
+                    // Recarga la lista para ver el promedio actualizado
                     cargarRecursos()
                     // Cierra el caso de éxito
                 }

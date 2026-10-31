@@ -89,6 +89,34 @@
                 android:textColor="?attr/colorPrimary"
                 android:textStyle="italic" />
 
+            <!-- Fila de acciones del estudiante: favorito y calificar (oculta para docentes) -->
+            <LinearLayout
+                android:id="@+id/llEstudiante"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <!-- Botón de estrella para marcar o desmarcar favorito -->
+                <ImageButton
+                    android:id="@+id/ibFavorito"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/desc_favorito"
+                    android:src="@android:drawable/btn_star_big_off" />
+
+                <!-- Botón para abrir el diálogo de calificación -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCalificar"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_calificar" />
+            </LinearLayout>
+
             <!-- Fila de acciones del docente (oculta para estudiantes) -->
             <LinearLayout
                 android:id="@+id/llAcciones"

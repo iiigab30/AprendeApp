@@ -157,4 +157,26 @@
     <string name="dialogo_eliminar_mensaje">¿Seguro que deseas eliminar “%1$s”? Esta acción no se puede deshacer.</string>
     <!-- Texto del botón que confirma la eliminación -->
     <string name="dialogo_eliminar_confirmar">Sí, eliminar</string>
+    <!-- Texto del chip que muestra solo los favoritos -->
+    <string name="chip_favoritos">Favoritos</string>
+    <!-- Texto del botón de calificar cuando aún no ha votado -->
+    <string name="btn_calificar">Calificar</string>
+    <!-- Texto del botón de calificar cuando ya votó (%1$d es su voto) -->
+    <string name="btn_calificar_mia">Tu voto: %1$d ★</string>
+    <!-- Descripción accesible del botón de favorito -->
+    <string name="desc_favorito">Marcar como favorito</string>
+    <!-- Título del diálogo de calificación (%1$s es el título del recurso) -->
+    <string name="dialogo_calificar_titulo">Calificar “%1$s”</string>
+    <!-- Texto del botón que envía la calificación -->
+    <string name="dialogo_calificar_enviar">Enviar</string>
+    <!-- Mensaje al calificar correctamente -->
+    <string name="msg_calificacion_enviada">¡Gracias por tu calificación!</string>
+    <!-- Error al enviar la calificación -->
+    <string name="error_calificar">No se pudo enviar la calificación</string>
+    <!-- Error cuando no se eligió ninguna estrella -->
+    <string name="error_sin_estrellas">Selecciona al menos una estrella</string>
+    <!-- Mensaje al agregar a favoritos -->
+    <string name="msg_favorito_agregado">Agregado a favoritos</string>
+    <!-- Mensaje al quitar de favoritos -->
+    <string name="msg_favorito_quitado">Quitado de favoritos</string>
 </resources>
