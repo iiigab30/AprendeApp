@@ -73,6 +73,8 @@ class RecursoController(private val api: ApiService = RetrofitClient.api) {
         campo: CampoBusqueda,
         // Tipo seleccionado en los chips (null significa todos)
         tipo: String?,
+        // Ids de favoritos para mostrar solo esos recursos (null significa sin filtro)
+        idsFavoritos: Set<String>?,
         // Criterio de orden elegido
         orden: Orden
         // Devuelve la lista ya filtrada y ordenada
@@ -83,6 +85,8 @@ class RecursoController(private val api: ApiService = RetrofitClient.api) {
         val filtrados = recursos.filter { recurso ->
             // Cumple el filtro de tipo si no hay tipo elegido o coincide exactamente
             val coincideTipo = tipo == null || recurso.tipo.equals(tipo, ignoreCase = true)
+            // Cumple el filtro de favoritos si no hay filtro o el id del recurso está en la lista
+            val coincideFavorito = idsFavoritos == null || recurso.id?.let { it in idsFavoritos } == true
             // Cumple la búsqueda si no hay texto o coincide según el campo elegido
             val coincideTexto = texto.isEmpty() || when (campo) {
                 // Por ID: coincidencia exacta
@@ -97,8 +101,8 @@ class RecursoController(private val api: ApiService = RetrofitClient.api) {
                         normalizar(recurso.tipo).contains(texto)
                 // Cierra el when
             }
-            // Debe cumplir ambas condiciones
-            coincideTipo && coincideTexto
+            // Debe cumplir las tres condiciones
+            coincideTipo && coincideTexto && coincideFavorito
             // Cierra el filter
         }
         // Ordena según el criterio elegido
@@ -166,6 +170,7 @@ suspend fun crear(recurso: Recurso): ResultadoOperacion {
             ResultadoOperacion.Error(R.string.error_eliminar_recurso)
             // Cierra el catch
         }
+
         // Cierra la función
     }
 
@@ -175,6 +180,37 @@ suspend fun crear(recurso: Recurso): ResultadoOperacion {
         val tieneProtocolo = url.startsWith("http://") || url.startsWith("https://")
         // Debe cumplir el patrón de dirección web de Android
         return tieneProtocolo && android.util.Patterns.WEB_URL.matcher(url).matches()
+        // Cierra la función
+    }
+
+    // Registra o corrige una calificación (1 a 5) y actualiza el recurso en la API (PUT)
+    suspend fun calificar(id: String, estrellas: Int, calificacionAnterior: Int): ResultadoOperacion {
+        // Intenta ejecutar las peticiones
+        return try {
+            // Pide el recurso actualizado para no pisar los votos de otros usuarios
+            val actual = api.obtenerRecurso(id)
+            // Si el usuario ya había votado, corrige su voto anterior
+            if (calificacionAnterior > 0) {
+                // Resta el voto anterior y suma el nuevo (la cantidad de votos no cambia)
+                actual.sumaCalificaciones = actual.sumaCalificaciones - calificacionAnterior + estrellas
+                // Si es su primer voto
+            } else {
+                // Suma las estrellas al total
+                actual.sumaCalificaciones += estrellas
+                // Cuenta un voto más
+                actual.numeroVotos += 1
+                // Cierra el if
+            }
+            // Envía el recurso actualizado a la API
+            api.actualizarRecurso(id, actual)
+            // Indica que todo salió bien
+            ResultadoOperacion.Exito
+            // Si falla la red o la API
+        } catch (e: Exception) {
+            // Devuelve el error de calificación
+            ResultadoOperacion.Error(R.string.error_calificar)
+            // Cierra el catch
+        }
         // Cierra la función
     }
 
