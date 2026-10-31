@@ -4,7 +4,8 @@ Aplicación Android desarrollada en **Kotlin** que funciona como un **Sistema de
 
 > Proyecto del **Tercer Desafío Práctico** de la asignatura **Desarrollo de Software para Móviles (DSM)**, Escuela de Ingeniería en Computación, Universidad Don Bosco, ciclo II-2026.
 
-**Autor:** [TU NOMBRE COMPLETO] · **Carnet:** [TU CARNET]
+**Autor:** Erika Gabriela Guevara Chicas · **Carnet:** GC250074
+**Video Defensa:** https://drive.google.com/drive/folders/1nbk3LxmFfBgBUw343TOPms8l1ECPzUtC?usp=sharing
 
 ---
 
