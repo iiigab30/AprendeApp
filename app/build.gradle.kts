@@ -62,5 +62,7 @@ dependencies {
     // Corrutinas de Kotlin para ejecutar tareas en segundo plano en Android
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     // Proporciona lifecycleScope para lanzar corrutinas ligadas al ciclo de vida de la pantalla
+    // Componente que permite deslizar hacia abajo para actualizar una lista
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 }

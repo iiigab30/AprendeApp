@@ -59,6 +59,8 @@ import com.example.aprendeapp.view.RecursoAdapter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 // Importa launch para iniciar corrutinas
 import kotlinx.coroutines.launch
+// Importa Snackbar para mostrar mensajes con un botón de acción
+import com.google.android.material.snackbar.Snackbar
 
 // Pantalla principal: lista de recursos con búsqueda, filtros, orden, CRUD, favoritos y calificación
 class MainActivity : AppCompatActivity() {
@@ -107,6 +109,8 @@ class MainActivity : AppCompatActivity() {
         configurarFiltros()
         // Muestra el botón de agregar solo si el usuario es docente
         configurarBotonAgregar()
+        // Configura el gesto de deslizar hacia abajo para actualizar
+        configurarRefresco()
         // Cierra onCreate
     }
 
@@ -131,8 +135,8 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.setOnMenuItemClickListener { opcion ->
             // Si se pulsó "Cerrar sesión"
             if (opcion.itemId == R.id.action_logout) {
-                // Cierra la sesión y vuelve al login
-                cerrarSesion()
+                // Pide confirmación antes de cerrar la sesión
+                confirmarCerrarSesion()
                 // Indica que el clic fue atendido
                 true
                 // Si fue otra opción
@@ -143,6 +147,23 @@ class MainActivity : AppCompatActivity() {
             }
             // Cierra el listener
         }
+        // Cierra la función
+    }
+
+    // Pide confirmación antes de cerrar la sesión
+    private fun confirmarCerrarSesion() {
+        // Construye y muestra el diálogo de confirmación
+        MaterialAlertDialogBuilder(this)
+            // Título del diálogo
+            .setTitle(R.string.dialogo_logout_titulo)
+            // Mensaje del diálogo
+            .setMessage(R.string.dialogo_logout_mensaje)
+            // Botón de cancelar: cierra el diálogo sin hacer nada
+            .setNegativeButton(R.string.btn_cancelar, null)
+            // Botón de confirmar: cierra la sesión
+            .setPositiveButton(R.string.dialogo_logout_titulo) { _, _ -> cerrarSesion() }
+            // Muestra el diálogo
+            .show()
         // Cierra la función
     }
 
@@ -256,6 +277,14 @@ class MainActivity : AppCompatActivity() {
         // Cierra la función
     }
 
+    // Configura el gesto de deslizar hacia abajo para recargar la lista
+    private fun configurarRefresco() {
+        // Al deslizar hacia abajo, vuelve a pedir los recursos a la API
+        binding.swipeRefresh.setOnRefreshListener { cargarRecursos() }
+        // Cierra la función
+    }
+
+
     // Pide los recursos a la API y actualiza la pantalla
     private fun cargarRecursos() {
         // Muestra el loader
@@ -270,16 +299,20 @@ class MainActivity : AppCompatActivity() {
                     todos = resultado.recursos
                     // Oculta el loader
                     mostrarCarga(false)
-                    // Muestra la lista aplicando búsqueda, filtro y orden
-                    aplicarFiltros()
+                    // Muestra la lista aplicando búsqueda, filtro y orden, con animación de entrada
+                    aplicarFiltros(animar = true)
                     // Cierra el caso de éxito
                 }
                 // Si la carga falló
                 is ResultadoRecursos.Error -> {
                     // Oculta el loader
                     mostrarCarga(false)
-                    // Muestra el motivo del error
-                    Toast.makeText(this@MainActivity, getString(resultado.mensajeId), Toast.LENGTH_LONG).show()
+                    // Muestra un mensaje que no desaparece hasta que el usuario lo atienda
+                    Snackbar.make(binding.root, getString(resultado.mensajeId), Snackbar.LENGTH_INDEFINITE)
+                        // Agrega el botón que vuelve a intentar la carga
+                        .setAction(R.string.btn_reintentar) { cargarRecursos() }
+                        // Muestra el mensaje
+                        .show()
                     // Cierra el caso de error
                 }
                 // Cierra el when
@@ -290,7 +323,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Aplica búsqueda, filtro y orden, y actualiza la lista en pantalla
-    private fun aplicarFiltros() {
+    // Aplica búsqueda, filtro y orden, y actualiza la lista en pantalla
+    private fun aplicarFiltros(animar: Boolean = false) {
         // Pide al controlador la lista ya filtrada y ordenada
         val resultado = controlador.filtrarYOrdenar(
             // Lista completa
@@ -307,19 +341,26 @@ class MainActivity : AppCompatActivity() {
             orden
             // Cierra los parámetros
         )
-        // Entrega la nueva lista al adaptador
-        adaptador.submitList(resultado)
+        // Entrega la nueva lista al adaptador y, cuando termina de actualizarse, ejecuta el bloque
+        adaptador.submitList(resultado) {
+            // Si se pidió animar, repite la animación de entrada de las tarjetas
+            if (animar) binding.rvRecursos.scheduleLayoutAnimation()
+            // Cierra el bloque
+        }
         // Muestra el mensaje vacío solo si terminó de cargar y no hay resultados
         binding.tvVacio.visibility = if (!cargando && resultado.isEmpty()) View.VISIBLE else View.GONE
         // Cierra la función
     }
 
     // Muestra u oculta el loader
+    // Muestra u oculta el loader
     private fun mostrarCarga(estado: Boolean) {
         // Guarda el estado de carga
         cargando = estado
-        // Cambia la visibilidad del loader
-        binding.pbCargando.visibility = if (estado) View.VISIBLE else View.GONE
+        // Muestra el loader central solo si no se está usando el indicador de deslizar
+        binding.pbCargando.visibility = if (estado && !binding.swipeRefresh.isRefreshing) View.VISIBLE else View.GONE
+        // Al terminar de cargar, detiene el indicador de deslizar
+        if (!estado) binding.swipeRefresh.isRefreshing = false
         // Mientras carga, oculta el mensaje de lista vacía
         if (estado) binding.tvVacio.visibility = View.GONE
         // Cierra la función

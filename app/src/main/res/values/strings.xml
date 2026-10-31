@@ -179,4 +179,10 @@
     <string name="msg_favorito_agregado">Agregado a favoritos</string>
     <!-- Mensaje al quitar de favoritos -->
     <string name="msg_favorito_quitado">Quitado de favoritos</string>
+    <!-- Texto del botón que reintenta la carga tras un error -->
+    <string name="btn_reintentar">Reintentar</string>
+    <!-- Título del diálogo de cerrar sesión -->
+    <string name="dialogo_logout_titulo">Cerrar sesión</string>
+    <!-- Mensaje del diálogo de cerrar sesión -->
+    <string name="dialogo_logout_mensaje">¿Deseas cerrar tu sesión?</string>
 </resources>

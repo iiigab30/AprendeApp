@@ -128,13 +128,21 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <!-- Lista de tarjetas con scroll -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvRecursos"
+        <!-- Contenedor que permite deslizar hacia abajo para actualizar la lista -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingBottom="88dp" />
+            android:layout_height="match_parent">
+
+            <!-- Lista de tarjetas con scroll y animación de entrada -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvRecursos"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:layoutAnimation="@anim/layout_animation_lista"
+                android:paddingBottom="88dp" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <!-- Loader circular centrado, visible solo mientras carga -->
         <ProgressBar

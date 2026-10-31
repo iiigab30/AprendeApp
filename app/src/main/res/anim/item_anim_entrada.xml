@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Animación de entrada de cada tarjeta: dura 350 ms y frena suavemente al final -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="350"
+    android:interpolator="@android:anim/decelerate_interpolator">
+    <!-- Desplaza la tarjeta desde un poco más abajo hasta su posición final -->
+    <translate
+        android:fromYDelta="12%p"
+        android:toYDelta="0" />
+    <!-- Hace que la tarjeta pase de transparente a visible -->
+    <alpha
+        android:fromAlpha="0"
+        android:toAlpha="1" />
+</set>
