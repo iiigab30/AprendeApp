@@ -27,6 +27,15 @@ enum class CampoBusqueda { TODO, ID, TITULO, TIPO }
 // Criterios de orden (el orden debe coincidir con R.array.opciones_orden)
 enum class Orden { TITULO_ASC, TITULO_DESC, TIPO, MEJOR_CALIFICADOS }
 
+// Resultado posible de crear, actualizar o eliminar un recurso
+sealed class ResultadoOperacion {
+    // Operación correcta (no necesita datos adicionales)
+    object Exito : ResultadoOperacion()
+    // Operación fallida: trae el id del texto de error a mostrar
+    data class Error(val mensajeId: Int) : ResultadoOperacion()
+// Cierra la clase sellada
+}
+
 // Controlador con la lógica de la lista de recursos
 class RecursoController(private val api: ApiService = RetrofitClient.api) {
 
@@ -107,4 +116,67 @@ class RecursoController(private val api: ApiService = RetrofitClient.api) {
         // Cierra la función
     }
 // Cierra la clase
+// Crea un recurso nuevo en la API (POST)
+suspend fun crear(recurso: Recurso): ResultadoOperacion {
+    // Intenta ejecutar la petición
+    return try {
+        // Envía el recurso a la API; MockAPI le asigna el id automáticamente
+        api.crearRecurso(recurso)
+        // Indica que todo salió bien
+        ResultadoOperacion.Exito
+        // Si falla la red o la API
+    } catch (e: Exception) {
+        // Devuelve el error de guardado
+        ResultadoOperacion.Error(R.string.error_guardar_recurso)
+        // Cierra el catch
+    }
+    // Cierra la función
+}
+
+    // Actualiza un recurso existente en la API (PUT)
+    suspend fun actualizar(recurso: Recurso): ResultadoOperacion {
+        // Intenta ejecutar la petición
+        return try {
+            // Toma el id del recurso; si no tiene, devuelve error
+            val id = recurso.id ?: return ResultadoOperacion.Error(R.string.error_guardar_recurso)
+            // Envía los datos nuevos a la API
+            api.actualizarRecurso(id, recurso)
+            // Indica que todo salió bien
+            ResultadoOperacion.Exito
+            // Si falla la red o la API
+        } catch (e: Exception) {
+            // Devuelve el error de guardado
+            ResultadoOperacion.Error(R.string.error_guardar_recurso)
+            // Cierra el catch
+        }
+        // Cierra la función
+    }
+
+    // Elimina un recurso de la API (DELETE)
+    suspend fun eliminar(id: String): ResultadoOperacion {
+        // Intenta ejecutar la petición
+        return try {
+            // Pide a la API que elimine el recurso
+            api.eliminarRecurso(id)
+            // Indica que todo salio bien
+            ResultadoOperacion.Exito
+            // Si falla la red o la API
+        } catch (e: Exception) {
+            // Devuelve el error de eliminación
+            ResultadoOperacion.Error(R.string.error_eliminar_recurso)
+            // Cierra el catch
+        }
+        // Cierra la función
+    }
+
+    // Indica si un texto es una URL válida que empieza con http:// o https://
+    fun esUrlValida(url: String): Boolean {
+        // Debe empezar con http:// o https://
+        val tieneProtocolo = url.startsWith("http://") || url.startsWith("https://")
+        // Debe cumplir el patrón de dirección web de Android
+        return tieneProtocolo && android.util.Patterns.WEB_URL.matcher(url).matches()
+        // Cierra la función
+    }
+
+
 }

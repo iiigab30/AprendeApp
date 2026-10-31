@@ -1,5 +1,7 @@
 // Declara el paquete donde vive esta clase
 package com.example.aprendeapp.model
+// Importa la interfaz que permite enviar el objeto entre pantallas
+import java.io.Serializable
 
 // Clase de datos que representa un recurso de aprendizaje de la API
 data class Recurso(
@@ -20,7 +22,7 @@ data class Recurso(
     // Cantidad de votos recibidos (var porque se actualiza al calificar)
     var numeroVotos: Int = 0
 // Cierra la lista de parámetros y abre el cuerpo de la clase
-) {
+) : Serializable {
     // Propiedad calculada: promedio de estrellas (no se envía a la API porque no tiene campo propio)
     val promedio: Double
         // Si no hay votos devuelve 0.0 para evitar dividir entre cero; si hay, calcula el promedio
