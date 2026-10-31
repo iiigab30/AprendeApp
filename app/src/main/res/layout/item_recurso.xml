@@ -88,6 +88,33 @@
                 android:ellipsize="end"
                 android:textColor="?attr/colorPrimary"
                 android:textStyle="italic" />
+
+            <!-- Fila de acciones del docente (oculta para estudiantes) -->
+            <LinearLayout
+                android:id="@+id/llAcciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="end"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <!-- Botón para editar el recurso -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEditar"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_editar" />
+
+                <!-- Botón para eliminar el recurso -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEliminar"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_eliminar" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

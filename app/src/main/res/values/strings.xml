@@ -111,4 +111,50 @@
         <item>Ordenar: Mejor calificados</item>
         <!-- Cierra la lista de opciones de orden -->
     </string-array>
+    <!-- Descripción accesible del botón flotante de agregar -->
+    <string name="btn_agregar_recurso">Agregar recurso</string>
+    <!-- Título del formulario al crear -->
+    <string name="form_titulo_nuevo">Nuevo recurso</string>
+    <!-- Título del formulario al editar -->
+    <string name="form_titulo_editar">Editar recurso</string>
+    <!-- Etiqueta del campo título -->
+    <string name="hint_titulo">Título</string>
+    <!-- Etiqueta del campo descripción -->
+    <string name="hint_descripcion">Descripción</string>
+    <!-- Etiqueta del campo enlace -->
+    <string name="hint_enlace">Enlace (URL)</string>
+    <!-- Etiqueta del campo imagen -->
+    <string name="hint_imagen">URL de la imagen</string>
+    <!-- Etiqueta del selector de tipo -->
+    <string name="label_tipo">Tipo de recurso</string>
+    <!-- Texto del botón guardar -->
+    <string name="btn_guardar">Guardar</string>
+    <!-- Texto del botón cancelar -->
+    <string name="btn_cancelar">Cancelar</string>
+    <!-- Texto del botón editar de la tarjeta -->
+    <string name="btn_editar">Editar</string>
+    <!-- Texto del botón eliminar de la tarjeta -->
+    <string name="btn_eliminar">Eliminar</string>
+    <!-- Error de título demasiado corto -->
+    <string name="error_titulo_corto">El título debe tener al menos 3 caracteres</string>
+    <!-- Error de descripción demasiado corta -->
+    <string name="error_descripcion_corta">La descripción debe tener al menos 10 caracteres</string>
+    <!-- Error de URL inválida -->
+    <string name="error_url_invalida">Ingresa una URL válida que empiece con http:// o https://</string>
+    <!-- Mensaje al crear un recurso -->
+    <string name="msg_recurso_creado">Recurso creado correctamente</string>
+    <!-- Mensaje al actualizar un recurso -->
+    <string name="msg_recurso_actualizado">Recurso actualizado correctamente</string>
+    <!-- Mensaje al eliminar un recurso -->
+    <string name="msg_recurso_eliminado">Recurso eliminado</string>
+    <!-- Error al guardar en la API -->
+    <string name="error_guardar_recurso">No se pudo guardar el recurso</string>
+    <!-- Error al eliminar en la API -->
+    <string name="error_eliminar_recurso">No se pudo eliminar el recurso</string>
+    <!-- Título del diálogo de confirmación -->
+    <string name="dialogo_eliminar_titulo">Eliminar recurso</string>
+    <!-- Mensaje del diálogo de confirmación (%1$s se reemplaza por el título) -->
+    <string name="dialogo_eliminar_mensaje">¿Seguro que deseas eliminar “%1$s”? Esta acción no se puede deshacer.</string>
+    <!-- Texto del botón que confirma la eliminación -->
+    <string name="dialogo_eliminar_confirmar">Sí, eliminar</string>
 </resources>

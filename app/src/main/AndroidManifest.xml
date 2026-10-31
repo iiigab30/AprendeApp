@@ -34,6 +34,11 @@
             android:name=".MainActivity"
             android:exported="false" />
 
+        <!-- Pantalla del docente para crear y editar recursos -->
+        <activity
+            android:name=".view.FormularioRecursoActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

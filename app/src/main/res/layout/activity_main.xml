@@ -125,7 +125,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingBottom="12dp" />
+            android:paddingBottom="88dp" />
 
         <!-- Loader circular centrado, visible solo mientras carga -->
         <ProgressBar
@@ -142,6 +142,17 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/sin_resultados"
+            android:visibility="gone" />
+
+        <!-- Botón flotante para agregar recursos (solo visible para docentes) -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAgregar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:contentDescription="@string/btn_agregar_recurso"
+            android:src="@android:drawable/ic_input_add"
             android:visibility="gone" />
     </FrameLayout>
 </LinearLayout>

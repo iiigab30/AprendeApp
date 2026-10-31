@@ -21,14 +21,20 @@ import com.example.aprendeapp.databinding.ItemRecursoBinding
 import com.example.aprendeapp.model.Recurso
 // Importa la utilidad de tipos
 import com.example.aprendeapp.utils.TiposRecurso
+import android.view.View
 
 // Adaptador que dibuja cada recurso como una tarjeta
 class RecursoAdapter(
+    // Indica si el usuario actual es docente (para mostrar los botones de edición)
+    private val esDocente: Boolean,
     // Función que se ejecuta cuando el usuario toca el enlace de una tarjeta
-    private val alAbrirEnlace: (Recurso) -> Unit
+    private val alAbrirEnlace: (Recurso) -> Unit,
+    // Función que se ejecuta cuando el docente pulsa "Editar"
+    private val alEditar: (Recurso) -> Unit,
+    // Función que se ejecuta cuando el docente pulsa "Eliminar"
+    private val alEliminar: (Recurso) -> Unit
 // Hereda de ListAdapter indicando el modelo y el ViewHolder
 ) : ListAdapter<Recurso, RecursoAdapter.RecursoViewHolder>(Comparador) {
-
     // Guarda las vistas de una tarjeta para reutilizarlas al hacer scroll
     class RecursoViewHolder(val binding: ItemRecursoBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -72,6 +78,12 @@ class RecursoAdapter(
             tvEnlace.text = recurso.enlace
             // Al tocar el enlace, avisa a la pantalla para que lo abra
             tvEnlace.setOnClickListener { alAbrirEnlace(recurso) }
+            // Muestra la fila de acciones solo si el usuario es docente
+            llAcciones.visibility = if (esDocente) View.VISIBLE else View.GONE
+            // Al pulsar "Editar" avisa a la pantalla con el recurso de esta tarjeta
+            btnEditar.setOnClickListener { alEditar(recurso) }
+            // Al pulsar "Eliminar" avisa a la pantalla con el recurso de esta tarjeta
+            btnEliminar.setOnClickListener { alEliminar(recurso) }
             // Carga la imagen desde la URL
             Glide.with(holder.itemView)
                 // Indica la URL de la imagen

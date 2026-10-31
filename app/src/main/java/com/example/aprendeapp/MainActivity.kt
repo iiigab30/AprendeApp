@@ -44,6 +44,12 @@ import com.example.aprendeapp.view.LoginActivity
 import com.example.aprendeapp.view.RecursoAdapter
 // Importa launch para iniciar corrutinas
 import kotlinx.coroutines.launch
+// Importa el constructor de diálogos de Material
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+// Importa el resultado de operaciones del controlador
+import com.example.aprendeapp.controller.ResultadoOperacion
+// Importa la pantalla del formulario
+import com.example.aprendeapp.view.FormularioRecursoActivity
 
 // Pantalla principal: lista de recursos con búsqueda, filtro y orden
 class MainActivity : AppCompatActivity() {
@@ -85,6 +91,8 @@ class MainActivity : AppCompatActivity() {
         // Configura búsqueda, spinners y chips
         configurarFiltros()
         // Cierra onCreate
+        // Muestra el botón de agregar solo si el usuario es docente
+        configurarBotonAgregar()
     }
 
     // Se ejecuta cada vez que la pantalla vuelve a primer plano (así la lista siempre está actualizada)
@@ -125,8 +133,18 @@ class MainActivity : AppCompatActivity() {
 
     // Configura el RecyclerView y su adaptador
     private fun configurarLista() {
-        // Crea el adaptador; al tocar un enlace se abre en el navegador
-        adaptador = RecursoAdapter { recurso -> abrirEnlace(recurso.enlace) }
+        // Crea el adaptador con las acciones de cada tarjeta
+        adaptador = RecursoAdapter(
+            // Le indica si debe mostrar los botones de docente
+            esDocente = sesion.esDocente(),
+            // Al tocar un enlace se abre en el navegador
+            alAbrirEnlace = { recurso -> abrirEnlace(recurso.enlace) },
+            // Al pulsar "Editar" abre el formulario con el recurso
+            alEditar = { recurso -> abrirFormulario(recurso) },
+            // Al pulsar "Eliminar" pide confirmación
+            alEliminar = { recurso -> confirmarEliminar(recurso) }
+            // Cierra los parámetros
+        )
         // Coloca las tarjetas en una sola columna vertical
         binding.rvRecursos.layoutManager = LinearLayoutManager(this)
         // Conecta el adaptador con la lista
@@ -264,6 +282,76 @@ class MainActivity : AppCompatActivity() {
         binding.pbCargando.visibility = if (estado) View.VISIBLE else View.GONE
         // Mientras carga, oculta el mensaje de lista vacía
         if (estado) binding.tvVacio.visibility = View.GONE
+        // Cierra la función
+    }
+
+    // Muestra el botón flotante solo a docentes y le asigna su acción
+    private fun configurarBotonAgregar() {
+        // Si el usuario es docente muestra el botón; si no, lo mantiene oculto
+        binding.fabAgregar.visibility = if (sesion.esDocente()) View.VISIBLE else View.GONE
+        // Al pulsarlo abre el formulario vacío para crear un recurso
+        binding.fabAgregar.setOnClickListener { abrirFormulario(null) }
+        // Cierra la función
+    }
+
+    // Abre el formulario: con un recurso para editar, o con null para crear
+    private fun abrirFormulario(recurso: Recurso?) {
+        // Crea el intent hacia la pantalla del formulario
+        val intent = Intent(this, FormularioRecursoActivity::class.java)
+        // Si hay recurso, lo envía para prellenar el formulario
+        if (recurso != null) intent.putExtra(FormularioRecursoActivity.EXTRA_RECURSO, recurso)
+        // Abre la pantalla
+        startActivity(intent)
+        // Cierra la función
+    }
+
+    // Pide confirmación antes de eliminar un recurso
+    private fun confirmarEliminar(recurso: Recurso) {
+        // Construye y muestra el diálogo de confirmación
+        MaterialAlertDialogBuilder(this)
+            // Título del diálogo
+            .setTitle(R.string.dialogo_eliminar_titulo)
+            // Mensaje con el nombre del recurso
+            .setMessage(getString(R.string.dialogo_eliminar_mensaje, recurso.titulo))
+            // Botón de cancelar: no hace nada y cierra el diálogo
+            .setNegativeButton(R.string.btn_cancelar, null)
+            // Botón de confirmar: elimina el recurso
+            .setPositiveButton(R.string.dialogo_eliminar_confirmar) { _, _ -> eliminarRecurso(recurso) }
+            // Muestra el diálogo
+            .show()
+        // Cierra la función
+    }
+
+    // Elimina un recurso en la API y recarga la lista
+    private fun eliminarRecurso(recurso: Recurso) {
+        // Toma el id del recurso; si no tiene, no hace nada
+        val id = recurso.id ?: return
+        // Muestra el loader
+        mostrarCarga(true)
+        // Lanza una corrutina para consultar la API
+        lifecycleScope.launch {
+            // Evalúa el resultado de la eliminación
+            when (val resultado = controlador.eliminar(id)) {
+                // Si se eliminó correctamente
+                is ResultadoOperacion.Exito -> {
+                    // Informa al usuario
+                    Toast.makeText(this@MainActivity, getString(R.string.msg_recurso_eliminado), Toast.LENGTH_SHORT).show()
+                    // Recarga la lista para que desaparezca la tarjeta
+                    cargarRecursos()
+                    // Cierra el caso de éxito
+                }
+                // Si hubo un error
+                is ResultadoOperacion.Error -> {
+                    // Oculta el loader
+                    mostrarCarga(false)
+                    // Muestra el motivo del error
+                    Toast.makeText(this@MainActivity, getString(resultado.mensajeId), Toast.LENGTH_LONG).show()
+                    // Cierra el caso de error
+                }
+                // Cierra el when
+            }
+            // Cierra la corrutina
+        }
         // Cierra la función
     }
 
