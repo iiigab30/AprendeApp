@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-  
+<!-- Menú de la barra superior -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- Opción para cerrar sesión (aparece en el menú de tres puntos) -->
+    <item
+        android:id="@+id/action_logout"
+        android:title="@string/btn_logout"
+        app:showAsAction="never" />
 </menu>

@@ -57,4 +57,58 @@
     <string name="msg_bienvenida_usuario">¡Bienvenido, %1$s!</string>
     <!-- Texto que muestra el rol actual (%1$s se reemplaza por el rol) -->
     <string name="main_rol_info">Rol: %1$s</string>
+    <!-- Título de la barra superior de la pantalla principal -->
+    <string name="main_titulo">Recursos de aprendizaje</string>
+    <!-- Etiqueta del campo de búsqueda -->
+    <string name="hint_buscar">Buscar recurso</string>
+    <!-- Texto del chip que muestra todos los tipos -->
+    <string name="filtro_todos">Todos</string>
+    <!-- Nombre visible del tipo libro -->
+    <string name="tipo_libro">Libro</string>
+    <!-- Nombre visible del tipo video -->
+    <string name="tipo_video">Video</string>
+    <!-- Nombre visible del tipo artículo -->
+    <string name="tipo_articulo">Artículo</string>
+    <!-- Nombre visible del tipo tutorial -->
+    <string name="tipo_tutorial">Tutorial</string>
+    <!-- Nombre visible para un tipo desconocido -->
+    <string name="tipo_otro">Otro</string>
+    <!-- Mensaje cuando la búsqueda o el filtro no devuelven nada -->
+    <string name="sin_resultados">No se encontraron recursos</string>
+    <!-- Error al cargar la lista desde la API -->
+    <string name="error_cargar_recursos">No se pudieron cargar los recursos</string>
+    <!-- Error al abrir el enlace de un recurso -->
+    <string name="error_abrir_enlace">No se pudo abrir el enlace</string>
+    <!-- ID del recurso mostrado en la tarjeta (%1$s se reemplaza por el id) -->
+    <string name="item_id">ID: %1$s</string>
+    <!-- Calificación promedio y cantidad de votos (%1$.1f promedio, %2$d votos) -->
+    <string name="item_calificacion">★ %1$.1f (%2$d)</string>
+    <!-- Descripción accesible de la imagen del recurso -->
+    <string name="desc_imagen_recurso">Imagen del recurso</string>
+
+    <!-- Opciones del selector de campo de búsqueda (el orden debe coincidir con el enum CampoBusqueda) -->
+    <string-array name="campos_busqueda">
+        <!-- Busca en ID, título y tipo a la vez -->
+        <item>Buscar en: Todo</item>
+        <!-- Busca solo por ID -->
+        <item>Buscar en: ID</item>
+        <!-- Busca solo por título -->
+        <item>Buscar en: Título</item>
+        <!-- Busca solo por tipo -->
+        <item>Buscar en: Tipo</item>
+        <!-- Cierra la lista de campos de búsqueda -->
+    </string-array>
+
+    <!-- Opciones del selector de orden (el orden debe coincidir con el enum Orden) -->
+    <string-array name="opciones_orden">
+        <!-- Título de la A a la Z -->
+        <item>Ordenar: Título (A-Z)</item>
+        <!-- Título de la Z a la A -->
+        <item>Ordenar: Título (Z-A)</item>
+        <!-- Agrupado por tipo -->
+        <item>Ordenar: Tipo</item>
+        <!-- De mayor a menor promedio -->
+        <item>Ordenar: Mejor calificados</item>
+        <!-- Cierra la lista de opciones de orden -->
+    </string-array>
 </resources>

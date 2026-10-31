@@ -1,32 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Columna vertical centrada con la información de la sesión -->
+<!-- Columna vertical que ocupa toda la pantalla (fitsSystemWindows evita que la barra de estado tape el contenido) -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp">
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
-    <!-- Texto de bienvenida con el nombre del usuario -->
-    <TextView
-        android:id="@+id/tvBienvenida"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+    <!-- Barra superior con título, rol del usuario y menú -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:title="@string/main_titulo" />
 
-    <!-- Texto que muestra el rol del usuario -->
-    <TextView
-        android:id="@+id/tvRol"
-        android:layout_width="wrap_content"
+    <!-- Contenedor del campo de búsqueda -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" />
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"
+        android:hint="@string/hint_buscar">
 
-    <!-- Botón para cerrar sesión -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnLogout"
-        android:layout_width="wrap_content"
+        <!-- Campo de texto de búsqueda de una sola línea -->
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etBuscar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:imeOptions="actionSearch"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Fila con los dos selectores: campo de búsqueda y orden -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/btn_logout" />
+        android:layout_marginHorizontal="12dp"
+        android:orientation="horizontal">
+
+        <!-- Selector del campo donde se busca -->
+        <Spinner
+            android:id="@+id/spBuscarPor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <!-- Selector del criterio de orden -->
+        <Spinner
+            android:id="@+id/spOrden"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <!-- Contenedor con scroll horizontal para los chips -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <!-- Grupo de chips: solo uno puede estar seleccionado y siempre hay uno -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupTipo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:singleSelection="true">
+
+            <!-- Chip para ver todos los tipos (seleccionado al iniciar) -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipTodos"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/filtro_todos" />
+
+            <!-- Chip para filtrar libros -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipLibro"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tipo_libro" />
+
+            <!-- Chip para filtrar videos -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipVideo"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tipo_video" />
+
+            <!-- Chip para filtrar artículos -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipArticulo"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tipo_articulo" />
+
+            <!-- Chip para filtrar tutoriales -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipTutorial"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tipo_tutorial" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <!-- Zona de la lista: ocupa el espacio restante y superpone loader y mensaje vacío -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Lista de tarjetas con scroll -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRecursos"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="12dp" />
+
+        <!-- Loader circular centrado, visible solo mientras carga -->
+        <ProgressBar
+            android:id="@+id/pbCargando"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <!-- Mensaje cuando no hay resultados -->
+        <TextView
+            android:id="@+id/tvVacio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/sin_resultados"
+            android:visibility="gone" />
+    </FrameLayout>
 </LinearLayout>
