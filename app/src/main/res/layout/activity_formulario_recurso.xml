@@ -1,6 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<!-- Columna vertical: barra superior arriba y formulario con scroll debajo -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Barra superior con flecha para volver -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        android:title="@string/form_titulo_nuevo" />
+
+    <!-- Contenedor con scroll para que el teclado no tape los campos -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <!-- Columna vertical con los campos del formulario -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Contenedor del campo título -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilTitulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_titulo">
+
+                <!-- Campo de texto del título -->
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etTitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Contenedor del campo descripción -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilDescripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="@string/hint_descripcion">
+
+                <!-- Campo de texto de varias líneas para la descripción -->
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDescripcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:minLines="3" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Etiqueta del selector de tipo -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/label_tipo" />
+
+            <!-- Selector del tipo de recurso -->
+            <Spinner
+                android:id="@+id/spTipo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Contenedor del campo enlace -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEnlace"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="@string/hint_enlace">
+
+                <!-- Campo de texto del enlace -->
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEnlace"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textUri" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Contenedor del campo imagen -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilImagen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="@string/hint_imagen">
+
+                <!-- Campo de texto de la URL de la imagen -->
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etImagen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textUri" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Loader circular, oculto hasta que se guarde -->
+            <ProgressBar
+                android:id="@+id/pbCargando"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:visibility="gone" />
+
+            <!-- Botón para guardar -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGuardar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/btn_guardar" />
+
+            <!-- Botón para cancelar -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelar"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_cancelar" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
