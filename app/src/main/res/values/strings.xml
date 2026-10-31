@@ -1,4 +1,60 @@
 <resources>
     <string name="app_name">AprendeApp</string>
     <string name="welcome_message">¡Bienvenido a AprendeApp!</string>
+    <!-- Título de la pantalla de login -->
+    <string name="login_titulo">Iniciar sesión</string>
+    <!-- Título de la pantalla de registro -->
+    <string name="registro_titulo">Crear cuenta</string>
+    <!-- Etiqueta del campo nombre -->
+    <string name="hint_nombre">Nombre completo</string>
+    <!-- Etiqueta del campo correo -->
+    <string name="hint_correo">Correo electrónico</string>
+    <!-- Etiqueta del campo contraseña -->
+    <string name="hint_password">Contraseña</string>
+    <!-- Etiqueta del campo confirmar contraseña -->
+    <string name="hint_confirmar_password">Confirmar contraseña</string>
+    <!-- Título del grupo de selección de rol -->
+    <string name="label_rol">Selecciona tu rol</string>
+    <!-- Nombre visible del rol estudiante -->
+    <string name="rol_estudiante">Estudiante</string>
+    <!-- Nombre visible del rol docente -->
+    <string name="rol_docente">Docente</string>
+    <!-- Texto del botón de login -->
+    <string name="btn_login">Ingresar</string>
+    <!-- Texto del botón de registro -->
+    <string name="btn_registrar">Registrarme</string>
+    <!-- Texto del enlace que lleva al registro -->
+    <string name="btn_ir_registro">¿No tienes cuenta? Regístrate</string>
+    <!-- Texto del enlace que lleva al login -->
+    <string name="btn_ir_login">¿Ya tienes cuenta? Inicia sesión</string>
+    <!-- Texto del botón de cerrar sesión -->
+    <string name="btn_logout">Cerrar sesión</string>
+    <!-- Error cuando un campo obligatorio está vacío -->
+    <string name="error_campo_vacio">Este campo es obligatorio</string>
+    <!-- Error cuando el correo no tiene formato válido -->
+    <string name="error_correo_invalido">Ingresa un correo válido</string>
+    <!-- Error de longitud mínima de contraseña -->
+    <string name="error_password_corta">Mínimo 12 caracteres</string>
+    <!-- Error por falta de mayúscula -->
+    <string name="error_password_mayuscula">Al menos una letra mayúscula</string>
+    <!-- Error por falta de minúscula -->
+    <string name="error_password_minuscula">Al menos una letra minúscula</string>
+    <!-- Error por falta de número -->
+    <string name="error_password_numero">Al menos un número</string>
+    <!-- Error por falta de carácter especial -->
+    <string name="error_password_especial">Al menos un carácter especial (!@#$%^&amp;*)</string>
+    <!-- Error cuando las contraseñas no coinciden -->
+    <string name="error_passwords_no_coinciden">Las contraseñas no coinciden</string>
+    <!-- Error cuando el correo ya está registrado -->
+    <string name="error_correo_existente">Ese correo ya está registrado</string>
+    <!-- Error genérico de credenciales incorrectas -->
+    <string name="error_credenciales">Correo o contraseña incorrectos</string>
+    <!-- Error de conexión con la API -->
+    <string name="error_conexion">No se pudo conectar con el servidor</string>
+    <!-- Mensaje de registro exitoso -->
+    <string name="msg_registro_exitoso">Cuenta creada, ya puedes iniciar sesión</string>
+    <!-- Saludo con el nombre del usuario (%1$s se reemplaza por el nombre) -->
+    <string name="msg_bienvenida_usuario">¡Bienvenido, %1$s!</string>
+    <!-- Texto que muestra el rol actual (%1$s se reemplaza por el rol) -->
+    <string name="main_rol_info">Rol: %1$s</string>
 </resources>

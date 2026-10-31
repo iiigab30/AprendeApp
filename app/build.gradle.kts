@@ -29,6 +29,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    // Abre el bloque de características de compilación
+    buildFeatures {
+        // Activa ViewBinding para acceder a las vistas de forma segura
+        viewBinding = true
+// Cierra el bloque buildFeatures
+    }
 }
 
 dependencies {

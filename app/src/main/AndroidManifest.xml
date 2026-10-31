@@ -13,16 +13,27 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AprendeApp">
+        <!-- Pantalla de login: es la que abre la app -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:name=".view.LoginActivity"
+            android:exported="true">
+            <!-- Marca esta actividad como punto de entrada de la app -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Pantalla de registro -->
+        <activity
+            android:name=".view.RegistroActivity"
+            android:exported="false" />
+
+        <!-- Pantalla principal (sin intent-filter, solo se abre desde el login) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

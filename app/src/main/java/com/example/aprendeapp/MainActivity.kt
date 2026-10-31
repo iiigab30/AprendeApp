@@ -1,50 +1,52 @@
 // Declara el paquete de la clase
 package com.example.aprendeapp
 
-// Importa la clase Bundle para el ciclo de vida de la Activity
+// Importa Intent para navegar entre pantallas
+import android.content.Intent
+// Importa Bundle para el ciclo de vida
 import android.os.Bundle
-// Importa Log para escribir mensajes en Logcat
-import android.util.Log
 // Importa la clase base de las pantallas
 import androidx.appcompat.app.AppCompatActivity
-// Importa lifecycleScope para lanzar corrutinas ligadas a la pantalla
-import androidx.lifecycle.lifecycleScope
-// Importa el cliente de Retrofit que creamos
-import com.example.aprendeapp.model.RetrofitClient
-// Importa launch para iniciar la corrutina
-import kotlinx.coroutines.launch
+// Importa el binding generado a partir de activity_main.xml
+import com.example.aprendeapp.databinding.ActivityMainBinding
+// Importa la pantalla de login
+import com.example.aprendeapp.view.LoginActivity
+// Importa el manejador de sesión
+import com.example.aprendeapp.utils.SesionManager
 
-// Pantalla principal (temporal, solo para probar la API)
+// Pantalla principal (temporal; en la Parte 5 mostrará la lista de recursos)
 class MainActivity : AppCompatActivity() {
+
+    // Acceso a las vistas del layout
+    private lateinit var binding: ActivityMainBinding
 
     // Se ejecuta al crear la pantalla
     override fun onCreate(savedInstanceState: Bundle?) {
         // Llama a la implementación base
         super.onCreate(savedInstanceState)
-        // Carga el layout por defecto
-        setContentView(R.layout.activity_main)
-
-        // Lanza una corrutina para no bloquear la pantalla
-        lifecycleScope.launch {
-            // Intenta hacer la llamada a la API
-            try {
-                // Pide la lista de recursos a MockAPI
-                val recursos = RetrofitClient.api.obtenerRecursos()
-                // Muestra en Logcat cuántos recursos llegaron
-                Log.d("API_TEST", "Recursos recibidos: ${recursos.size}")
-                // Recorre cada recurso recibido
-                recursos.forEach {
-                    // Muestra el id y el título de cada recurso
-                    Log.d("API_TEST", "${it.id} - ${it.titulo} (${it.tipo})")
-                    // Cierra el forEach
-                }
-                // Si ocurre un error (sin internet, URL mala, etc.)
-            } catch (e: Exception) {
-                // Muestra el error en Logcat
-                Log.e("API_TEST", "Error al conectar: ${e.message}")
-                // Cierra el catch
-            }
-            // Cierra la corrutina
+        // Crea el manejador de sesión
+        val sesion = SesionManager(this)
+        // Infla el layout y crea el binding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        // Muestra el layout en pantalla
+        setContentView(binding.root)
+        // Muestra el saludo con el nombre guardado en la sesión
+        binding.tvBienvenida.text = getString(R.string.msg_bienvenida_usuario, sesion.obtenerNombre())
+        // Elige el texto del rol según si es docente o estudiante
+        val rolTexto = if (sesion.esDocente()) R.string.rol_docente else R.string.rol_estudiante
+        // Muestra el rol del usuario
+        binding.tvRol.text = getString(R.string.main_rol_info, getString(rolTexto))
+        // Al pulsar "Cerrar sesión"
+        binding.btnLogout.setOnClickListener {
+            // Borra la sesión guardada
+            sesion.cerrarSesion()
+            // Abre el login limpiando el historial de pantallas
+            startActivity(Intent(this, LoginActivity::class.java).apply {
+                // Evita que el botón "atrás" regrese a la pantalla principal
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                // Cierra el apply
+            })
+            // Cierra el listener
         }
         // Cierra onCreate
     }
